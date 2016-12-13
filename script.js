@@ -26,11 +26,33 @@ $(function() {
     function init() {
         // initialize the data
         var courses = jsonData[major][conc];
-        // place those at the top
+        
+        // calculate the tree
+        var tree = calculateCourseTree(courses);
+        
+        // print out the results to the user
+        for (var i = tree.length - 1; i >= 0; i--) {
+            var $row = $(document.createElement("div"));
+            $row.addClass("row");
+            for (var j = 0; j < tree[i].length; j++) {
+                var course = tree[i][j];
+                $row.append("<div class=course id="
+                            + course.id + ">" + course.name
+                            + "</div>");
+            }
+            $(document.body).append($row);
+        }
+        console.log(rows);
+    }
+    
+    // calculate the tree of courses (i.e. which courses go to which row)
+    function calculateCourseTree(courses) {
+        // preprocess data by placing all courses at the top
         for (var i = 0; i < courses.length; i++) {
             courses[i].row = 0;
             rows[0].push(courses[i]);
         }
+        
         // recursively move the course's prereqs (and sub-prereqs)
         // one row below current row
         var i = 0;
@@ -43,8 +65,13 @@ $(function() {
             i++;
         } while (rows[i] && rows[i].length > 0);
         
-        // print out the results to the user
-        console.log(rows);
+        // find all co-requisites and add them back where they belong
+        // for all that have a co-requisite
+        //   select co-requisites of said course
+        //   find out which has the lowest tree position
+        //   move them all to the lowest row
+        
+        return rows;
     }
     
     // function to move course down to a specified row

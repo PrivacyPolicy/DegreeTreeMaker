@@ -1,0 +1,22 @@
+body {
+    font-family: sans-serif;
+}
+
+.row {
+    white-space: nowrap;
+    margin-bottom: 100px;
+}
+
+.course {
+    width: 170px;
+    height: 60px;
+    background: blue;
+    margin: 5px;
+    padding: 30px;
+    color: white;
+    white-space: normal;
+    text-align: center;
+    align-content: center;
+    display: inline-flex;
+    align-self: center;
+}
