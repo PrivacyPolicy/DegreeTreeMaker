@@ -30,9 +30,9 @@ $(function() {
         // calculate the tree
         var tree = calculateCourseTree(courses);
         
-        // print out the results to the user
-        for (var i = tree.length - 1; i >= 0; i--) {
-//        for (var i = 0; i < tree.length; i++) {
+        // display course blocks
+//        for (var i = tree.length - 1; i >= 0; i--) {
+        for (var i = 0; i < tree.length; i++) {
             var $row = $(document.createElement("div"));
             $row.addClass("row");
             for (var j = 0; j < tree[i].length; j++) {
@@ -42,6 +42,56 @@ $(function() {
                             + "</div>");
             }
             $(document.body).append($row);
+        }
+        
+            
+        // display lines from courses to their prereqs
+        for (var i = 0; i < tree.length; i++) {
+            for (var j = 0; j < tree[i].length; j++) {
+                var $from = $("#" + tree[i][j].id);
+                var fromX = $from.offset().left + $from.width() / 2 + parseInt($from.css("padding"));
+                var fromY = $from.offset().top + $from.height() + parseInt($from.css("padding")) * 2;
+                eachPrereqInCourse(tree, tree[i][j], function(prereq) {
+                    var $to = $("#" + prereq.id);
+                    var toX = $to.offset().left + $to.width() / 2 + parseInt($to.css("padding"));
+                    var toY = $to.offset().top;
+                    // draw the line
+                    var $line = $(document.createElement("div"));
+                    $line.addClass("line");
+                    var dY = toY - fromY, dX = toX - fromX;
+                    var width = Math.sqrt(dX * dX + dY * dY);
+                    var angle = Math.acos(dY / dX);
+                    angle = (dX < 0) ? angle + Math.PI / 2 : angle;
+                    if (dX == 0) {
+                        angle = -Math.PI / 2;
+                    }
+                    $line.css({
+                        left: fromX + "px",
+                        top: fromY + "px",
+                        transform: "rotate(" + -angle + "rad)",
+                        width: width + "px"
+                    });
+                    console.log(prereq.id);
+                    if (DEBUG) {
+                        console.log(fromX + ", " + fromY);
+                        $(document.createElement("div")).css({
+                            left: toX + "px",
+                            top: toY + "px",
+                            width: "5px",
+                            height: "5px",
+                            background: "red"
+                        }).addClass("line").appendTo("body");
+                        $(document.createElement("div")).css({
+                            left: fromX + "px",
+                            top: fromY + "px",
+                            width: "5px",
+                            height: "5px",
+                            background: "red"
+                        }).addClass("line").appendTo("body");
+                    }
+                    $line.appendTo("body");
+                });
+            }
         }
         console.log(rows);
     }
@@ -56,15 +106,19 @@ $(function() {
         
         // recursively move the course's prereqs (and sub-prereqs)
         // one row below current row
-        var i = 0;
+        var lastRows;
         do {
-            eachPrereqInRow(rows, i, function(course) {
-                if (course.row < i + 1) {
-                    moveCourseToRow(rows, course, i + 1, true);
-                }
-            });
-            i++;
-        } while (rows[i] && rows[i].length > 0);
+            lastRows = JSON.stringify(rows);
+            var i = 0;
+            do {
+                eachPrereqInRow(rows, i, function(course) {
+                    if (course.row < i + 1) {
+                        moveCourseToRow(rows, course, i + 1, true);
+                    }
+                });
+                i++;
+            } while (rows[i] && rows[i].length > 0);
+        } while (lastRows != JSON.stringify(rows)); // until no change has occured
         // find all co-requisites and add them back where they belong
         // for all that have a co-requisite
         for (var i = 0; i < rows.length; i++) {
@@ -82,7 +136,6 @@ $(function() {
                         maxRow = Math.max(coreqs[k].row, maxRow);
                     }
                     for (var k = 0; k < coreqs.length; k++) {
-                        console.log(coreqs[k].row + " : " + coreqs[k].name);
                         moveCourseToRow(rows, coreqs[k], maxRow, false);
                     }
                 }

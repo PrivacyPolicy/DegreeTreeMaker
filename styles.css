@@ -1,3 +1,7 @@
+* {
+    margin: 0;
+}
+
 body {
     font-family: sans-serif;
 }
@@ -5,6 +9,8 @@ body {
 .row {
     white-space: nowrap;
     margin-bottom: 100px;
+    text-align: center;
+    -margin: 0;
 }
 
 .course {
@@ -17,6 +23,15 @@ body {
     white-space: normal;
     text-align: center;
     align-content: center;
-    display: inline-flex;
+    display: inline-table;
     align-self: center;
+    -margin: 0;
+    -padding: 0;
+}
+
+.line {
+    background: black;
+    height: 2px;
+    position: absolute;
+    transform-origin: left;
 }
