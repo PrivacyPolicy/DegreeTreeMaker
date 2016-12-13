@@ -32,6 +32,7 @@ $(function() {
         
         // print out the results to the user
         for (var i = tree.length - 1; i >= 0; i--) {
+//        for (var i = 0; i < tree.length; i++) {
             var $row = $(document.createElement("div"));
             $row.addClass("row");
             for (var j = 0; j < tree[i].length; j++) {
@@ -59,24 +60,41 @@ $(function() {
         do {
             eachPrereqInRow(rows, i, function(course) {
                 if (course.row < i + 1) {
-                    moveCourseToRow(rows, course, i + 1);
+                    moveCourseToRow(rows, course, i + 1, true);
                 }
             });
             i++;
         } while (rows[i] && rows[i].length > 0);
-        
         // find all co-requisites and add them back where they belong
         // for all that have a co-requisite
-        //   select co-requisites of said course
-        //   find out which has the lowest tree position
-        //   move them all to the lowest row
+        for (var i = 0; i < rows.length; i++) {
+            for (var j = 0; j < rows[i].length; j++) {
+                var course = rows[i][j];
+                if (course.coreq.length > 0) {
+                    var coreqs = [course];
+                    for (var k = 0; k < course.coreq.length; k++) {
+                        coreqs.push(findCourseByID(
+                            rows, course.coreq[k]));
+                    }
+                    // move all coreqs to the lowest row
+                    var maxRow = 0;
+                    for (var k = 0; k < coreqs.length; k++) {
+                        maxRow = Math.max(coreqs[k].row, maxRow);
+                    }
+                    for (var k = 0; k < coreqs.length; k++) {
+                        console.log(coreqs[k].row + " : " + coreqs[k].name);
+                        moveCourseToRow(rows, coreqs[k], maxRow, false);
+                    }
+                }
+            }
+        }
         
         return rows;
     }
     
     // function to move course down to a specified row
     // moves the course and all prerequisites underneath it recursively
-    function moveCourseToRow(rows, course, row) {
+    function moveCourseToRow(rows, course, row, recursive) {
         // delete from old row
         for (var i = 0; i < rows[course.row].length; i++) {
             if (rows[course.row][i].id == course.id) {
@@ -91,9 +109,11 @@ $(function() {
         rows[row].push(course);
         
         // move all of the course's prerequisites, too
-        eachPrereqInCourse(rows, course, function(prereq) {
-            moveCourseToRow(rows, prereq, row + 1);
-        });
+        if (recursive) {
+            eachPrereqInCourse(rows, course, function(prereq) {
+                moveCourseToRow(rows, prereq, row + 1, true);
+            });
+        }
     }
     
     // function to find course from a list by id
