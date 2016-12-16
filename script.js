@@ -1,6 +1,6 @@
 var jsonData = {};
 var rows = [[]];
-const DEBUG = true;
+const DEBUG = false;
 const HIDE_SINGLES = false;
 
 $(function() {
@@ -70,11 +70,11 @@ $(function() {
             for (var j = 0; j < tree[i].length; j++) {
                 var $from = $("#" + tree[i][j].id);
                 var fromX = $from.offset().left + $from.width() / 2 + parseInt($from.css("padding"));
-                var fromY = $from.offset().top + $from.height() + parseInt($from.css("padding")) * 2;
+                var fromY = $from.offset().top// + $from.height() + parseInt($from.css("padding")) * 2;
                 eachPrereqInCourse(tree, tree[i][j], function(prereq) {
                     var $to = $("#" + prereq.id);
                     var toX = $to.offset().left + $to.width() / 2 + parseInt($to.css("padding"));
-                    var toY = $to.offset().top;
+                    var toY = $to.offset().top + $to.height() + parseInt($to.css("padding")) * 2;
                     // draw the line
                     var $line = $(document.createElement("div"));
                     $line.addClass("line");
