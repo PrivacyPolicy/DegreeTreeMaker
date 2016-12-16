@@ -76,6 +76,7 @@ $(function() {
             $row.addClass("row");
             for (var j = 0; j < tree[i].length; j++) {
                 var course = tree[i][j];
+                // find prerequsities
                 var prereqs = "Prerequisites:\n";
                 for (var k = 0; k < course.prereqs.length; k++) {
                     var id = course.prereqs[k];
@@ -99,9 +100,17 @@ $(function() {
                     }
                 }
                 if (k === 0) prereqs += "None";
+                // find courses which have this course as prerequisite
+                var dependStr = "Dependants:\n";
+                var dependants = getDependants(rows, course);
+                for (var k = 0; k < dependants.length; k++) {
+                    dependStr += dependants[k].name
+                        + ((k !== dependants.length - 1) ? " AND\n" : "");
+                }
+                var tooltip = prereqs + "\n\n" + dependStr;
                 $row.append("<div class=course id="
                             + course.id + " title=\""
-                            + prereqs + "\" tabindex=0>"
+                            + tooltip + "\" tabindex=0>"
                             + course.name
                             + "</div>");
             }
@@ -242,6 +251,36 @@ $(function() {
             }
         }
         return count;
+    }
+    
+    // function to get all depencies and return as a list
+    function getDependants(rows, course) {
+        var courses = [];
+        for (var i = 0; i < rows.length; i++) {
+            for (var j = 0; j < rows[i].length; j++) {
+                if (arrayContains(rows[i][j].prereqs, course.id)) {
+                    courses.push(rows[i][j]);
+                }
+            }
+        }
+        return courses;
+    }
+    
+    // find if an array contains a value in itself or in subarray
+    function arrayContains(array, value) {
+        for (var i in array) {
+            if (typeof array[i] === typeof value) {
+                if (array[i] == value) {
+                    return true;
+                }
+            } else if (typeof array[i] === "object"
+                       && array[i].length !== undefined) {
+                if (arrayContains(array[i], value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     // function to move course down to a specified row
