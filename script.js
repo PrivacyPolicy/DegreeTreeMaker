@@ -1,7 +1,7 @@
-const DEBUG = false;
-const HIDE_SINGLES = false;
-
 $(function() {
+    const DEBUG = false;
+    const HIDE_SINGLES = false;
+    
     var major = "Computer Science & Information Technology, B.S.";
     var conc = "Information Assurance & Cyber Security";
     var jsonData = {};
@@ -22,7 +22,8 @@ $(function() {
                 for (var c in jsonData[m]) {
                     $("#degreeConcentration").append(
                         "<option value=\"" + m + "-" + c + "\""
-                        + ">" + m + " - " + c + "</option>");
+                        + ">" + m + " &nbsp;-&nbsp; " + c
+                        + "</option>");
                 }
             }
             $("#degreeConcentration").change(selectDegree);
@@ -38,7 +39,6 @@ $(function() {
             var a = option.value.split("-");
             major = a[0];
             conc = a[1];
-            $("#degreeConcentration").addClass("hidden");
             init();
         }
     }
@@ -71,6 +71,8 @@ $(function() {
         
         // display course blocks
         const LEFT_OFFSET = 10;
+        $(".row, .line").remove();
+        rows = [[]];
         for (var i = tree.length - 1; i >= 0; i--) {
 //        for (var i = 0; i < tree.length; i++) {
             var $row = $(document.createElement("div"));

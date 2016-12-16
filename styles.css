@@ -7,14 +7,7 @@ body {
 }
 
 #degreeConcentration {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-#degreeConcentration.hidden {
-    display: none;
+    margin: 10px;
 }
 
 .row {
@@ -46,6 +39,7 @@ body {
     position: absolute;
     transform-origin: left;
     border-bottom: 2px solid;
+    pointer-events: none;
     
     -webkit-transition: opacity .4s;
     transition: opacity .4s;
@@ -53,5 +47,4 @@ body {
 
 .line.invisible {
     opacity: 0;
-    pointer-events: none;
 }
