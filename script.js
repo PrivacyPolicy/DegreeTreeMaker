@@ -72,7 +72,6 @@ $(function() {
         // display course blocks
         const LEFT_OFFSET = 10;
         $(".row, .line").remove();
-        rows = [[]];
         for (var i = tree.length - 1; i >= 0; i--) {
 //        for (var i = 0; i < tree.length; i++) {
             var $row = $(document.createElement("div"));
@@ -106,7 +105,7 @@ $(function() {
                 if (k === 0) prereqs += "None";
                 // find courses which have this course as prerequisite
                 var dependStr = "Dependants:\n";
-                var dependants = getDependants(rows, course);
+                var dependants = getDependants(tree, course);
                 for (var k = 0; k < dependants.length; k++) {
                     dependStr += dependants[k].name
                         + ((k !== dependants.length - 1) ? " AND\n" : "");
@@ -182,6 +181,7 @@ $(function() {
     
     // calculate the tree of courses (i.e. which courses go to which row)
     function calculateCourseTree(courses) {
+        rows = [[]];
         // preprocess data by placing all courses at the top
         for (var i = 0; i < courses.length; i++) {
             courses[i].row = 0;
