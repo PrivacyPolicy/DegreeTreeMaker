@@ -110,6 +110,7 @@ $(function() {
                     dependStr += dependants[k].name
                         + ((k !== dependants.length - 1) ? " AND\n" : "");
                 }
+                if (k === 0) dependStr += "None";
                 var tooltip = prereqs + "\n\n" + dependStr;
                 $row.append("<div class=course id="
                             + course.id + " title=\""
