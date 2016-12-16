@@ -301,9 +301,7 @@ $(function() {
     // some fun visual stuff
     function setListeners() {
         $(".course").on("focus", function(event) {
-            setTimeout(function() {
-                showHideLines(true, event);
-            }, 10);
+            showHideLines(true, event);
         }).on("blur", function(event) {
             if ($(":focus").size() === 0) {
                 showHideLines(false, event);
