@@ -2,8 +2,6 @@ const DEBUG = false;
 const HIDE_SINGLES = false;
 
 $(function() {
-    
-    // TODO provide way of changing this at the beginning
     var major = "Computer Science & Information Technology, B.S.";
     var conc = "Information Assurance & Cyber Security";
     var jsonData = {};
@@ -14,7 +12,9 @@ $(function() {
         dataType: "json",
         data: null,
         success: function(data, textStatus, jqXHR) {
-            console.log("Loaded JSON just fine: %o", data);
+            if (DEBUG) {
+                console.log("Loaded JSON just fine: %o", data);
+            }
             jsonData = data;
             
             // fill select box with data
@@ -70,10 +70,12 @@ $(function() {
         var tree = calculateCourseTree(courses);
         
         // display course blocks
+        const LEFT_OFFSET = 10;
         for (var i = tree.length - 1; i >= 0; i--) {
 //        for (var i = 0; i < tree.length; i++) {
             var $row = $(document.createElement("div"));
-            $row.addClass("row");
+            $row.addClass("row")
+                .css("left", ((tree.length - i) * LEFT_OFFSET) + "px");
             for (var j = 0; j < tree[i].length; j++) {
                 var course = tree[i][j];
                 // find prerequsities
@@ -223,7 +225,7 @@ $(function() {
         }
         
         // organize all of the rows
-        // most important classes to the left
+        // most important courses to the left
         for (var i = 0; i < rows.length; i++) {
             rows[i].sort(sortCourses);
         }
