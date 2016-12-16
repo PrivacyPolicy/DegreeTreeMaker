@@ -12,34 +12,38 @@ body {
 
 .row {
     white-space: nowrap;
-    margin-bottom: 100px;
+    margin-bottom: 50px;
     position: relative;
 }
 
 .course {
-    width: 170px;
-    height: 60px;
+    width: 100px;
+    height: 40px;
     background: blue;
-    margin: 5px;
-    padding: 30px;
+    margin: 3px;
+    padding: 10px;
     color: white;
     white-space: normal;
     text-align: center;
     align-content: center;
-    display: inline-table;
+    display: inline-block;
     align-self: center;
     cursor: pointer;
+    font-size: 10px;
+    overflow: hidden;
 }
 
 .course:focus {
-    outline: 5px solid skyblue;
+    outline: 4px solid skyblue;
 }
 
 .line {
     position: absolute;
     transform-origin: left;
-    border-bottom: 2px solid;
+    border-bottom: 1px solid rgba(0, 0, 0, .7);
+    border-width: 1px;
     pointer-events: none;
+    background: none;
     
     -webkit-transition: opacity .4s;
     transition: opacity .4s;

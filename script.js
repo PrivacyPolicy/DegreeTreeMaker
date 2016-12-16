@@ -152,7 +152,7 @@ $(function() {
                         transform: "rotate(" + angle + "rad)",
                         "-moz-transform": "rotate(" + angle + "rad)",
                         width: width + "px",
-                        border: (or) ? "2px dashed" : "2px solid"
+                        borderStyle: (or) ? "dashed" : "solid"
                     });
                     $line.attr("data-from", $from.attr("id"));
                     $line.attr("data-to", $to.attr("id"));
