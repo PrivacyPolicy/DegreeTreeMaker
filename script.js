@@ -162,12 +162,28 @@ $(function() {
         }
         
         function sortCourses(a, b) {
-            if (a.prereqs.length > b.prereqs.length) return -1;
-            if (a.prereqs.length < b.prereqs.length) return 1;
+            var _a = a.prereqs.length + getDependantsCount(rows, a);
+            var _b = b.prereqs.length + getDependantsCount(rows, b);
+            if (_a > _b) return -1;
+            if (_a < _b) return 1;
             return 0;
         }
         
         return rows;
+    }
+    
+    // function to count how many courses have course as a prereq
+    function getDependantsCount(rows, course) {
+        var count = 0;
+        for (var i = 0; i < rows.length; i++) {
+            for (var j = 0; j < rows[i].length; j++) {
+                if (rows[i][j].prereqs.indexOf(course.id) 
+                    !== -1) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
     
     // function to move course down to a specified row
