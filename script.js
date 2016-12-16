@@ -59,10 +59,25 @@ $(function() {
                 var course = tree[i][j];
                 var prereqs = "Prerequisites:\n";
                 for (var k = 0; k < course.prereqs.length; k++) {
-                    var c = findCourseByID(rows, course.prereqs[k]);
-                    if (c == null) continue;
-                    prereqs += c.name
-                        + ((k !== course.prereqs.length) ? "\n" : "");
+                    var id = course.prereqs[k];
+                    if (typeof id === "number") {
+                        var c = findCourseByID(rows, course.prereqs[k]);
+                        if (c == null) continue;
+                        prereqs += c.name
+                            + ((k !== course.prereqs.length - 1) ? " AND\n" : "");
+                    } else if (typeof id === "object") {
+                        var list = id;
+                        prereqs += "(";
+                        var subprereqs = [];
+                        for (var l = 0; l < list.length; l++) {
+                            var c = findCourseByID(rows, list[l]);
+                            if (c !== null) subprereqs.push(c);
+                        }
+                        for (var l = 0; l < subprereqs.length; l++) {
+                            prereqs += subprereqs[l].name
+                                + ((l !== subprereqs.length - 1) ? " OR\n" : ")\n");
+                        }
+                    }
                 }
                 if (k === 0) prereqs += "None";
                 $row.append("<div class=course id="
@@ -84,7 +99,7 @@ $(function() {
                 var fromY = $from.offset().top
 //                    + $from.height()
 //                    + parseInt($from.css("padding-top")) * 2;
-                eachPrereqInCourse(tree, tree[i][j], function(prereq) {
+                eachPrereqInCourse(tree, tree[i][j], function(prereq, or) {
                     var $to = $("#" + prereq.id);
                     var toX = $to.offset().left
                         + $to.width() / 2
@@ -103,7 +118,8 @@ $(function() {
                         top: fromY + "px",
                         transform: "rotate(" + angle + "rad)",
                         "-moz-transform": "rotate(" + angle + "rad)",
-                        width: width + "px"
+                        width: width + "px",
+                        border: (or) ? "2px dashed" : "2px solid"
                     });
                     if (DEBUG) {
                         $(document.createElement("div")).css({
@@ -253,9 +269,25 @@ $(function() {
     // look in rows. Else, give up.
     function eachPrereqInCourse(rows, course, callback) {
         for (var i = 0; i < course.prereqs.length; i++) {
-            var prereq = findCourseByID(rows, course.prereqs[i]);
-            if (prereq) {
-                callback(prereq);
+            var prereqID = course.prereqs[i];
+            if (typeof prereqID === "number") {
+                var prereq = findCourseByID(rows, prereqID);
+                if (prereq !== null) {
+                    callback(prereq, false);
+                }
+            } else if (typeof prereqID === "object") {
+                var list = prereqID;
+                var prereqObjs = [];
+                for (var j = 0; j < list.length; j++) {
+                    var prereq = findCourseByID(rows, list[j]);
+                    if (prereq !== null) {
+                        prereqObjs.push(prereq);
+                    }
+                }
+                for (var j = 0; j < prereqObjs.length; j++) {
+                    callback(prereqObjs[j],
+                             (prereqObjs.length > 1));
+                }
             }
         }
     }
