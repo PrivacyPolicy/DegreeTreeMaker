@@ -1,7 +1,7 @@
 var jsonData = {};
 var rows = [[]];
 const DEBUG = true;
-const HIDE_SINGLES = true;
+const HIDE_SINGLES = false;
 
 $(function() {
     
@@ -28,26 +28,31 @@ $(function() {
         // initialize the data
         var courses = jsonData[major][conc];
         
-//        var prereqIDs = [];
-//        for (var i = 0; i < courses.length; i++) {
-//            
-//        }
-//        if (HIDE_SINGLES) {
-//            for (var i = courses.length - 1; i >= 0; i--) {
-//                console.log(c);
-//                var c = courses[i];
-//                if (c.coreq.length === 0 && c.prereqs.length === 0) {
-//                    courses.splice(i, 1);
-//                }
-//            }
-//        }
+        if (HIDE_SINGLES) {
+            var prereqIDs = [];
+            for (var i = 0; i < courses.length; i++) {
+                var p = courses[i].prereqs;
+                for (var j = 0; j < p.length; j++) {
+                    if (prereqIDs.indexOf(p[j]) === -1) {
+                        prereqIDs.push(p[j]);
+                    }
+                }
+            }
+            for (var i = courses.length - 1; i >= 0; i--) {
+                var c = courses[i];
+                if (c.coreq.length === 0 && c.prereqs.length === 0
+                    && prereqIDs.indexOf(c.id) === -1) {
+                    courses.splice(i, 1);
+                }
+            }
+        }
         
         // calculate the tree
         var tree = calculateCourseTree(courses);
         
         // display course blocks
-//        for (var i = tree.length - 1; i >= 0; i--) {
-        for (var i = 0; i < tree.length; i++) {
+        for (var i = tree.length - 1; i >= 0; i--) {
+//        for (var i = 0; i < tree.length; i++) {
             var $row = $(document.createElement("div"));
             $row.addClass("row");
             for (var j = 0; j < tree[i].length; j++) {
@@ -82,9 +87,7 @@ $(function() {
                         transform: "rotate(" + angle + "rad)",
                         width: width + "px"
                     });
-//                    console.log(prereq.id);
                     if (DEBUG) {
-//                        console.log(fromX + ", " + fromY);
                         $(document.createElement("div")).css({
                             left: toX + "px",
                             top: toY + "px",
@@ -104,7 +107,6 @@ $(function() {
                 });
             }
         }
-//        console.log(rows);
     }
     
     // calculate the tree of courses (i.e. which courses go to which row)
