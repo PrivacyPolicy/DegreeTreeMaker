@@ -57,8 +57,17 @@ $(function() {
             $row.addClass("row");
             for (var j = 0; j < tree[i].length; j++) {
                 var course = tree[i][j];
+                var prereqs = "Prerequisites:\n";
+                for (var k = 0; k < course.prereqs.length; k++) {
+                    var c = findCourseByID(rows, course.prereqs[k]);
+                    if (c == null) continue;
+                    prereqs += c.name
+                        + ((k !== course.prereqs.length) ? "\n" : "");
+                }
+                if (k === 0) prereqs += "None";
                 $row.append("<div class=course id="
-                            + course.id + ">" + course.name
+                            + course.id + " title=\""
+                            + prereqs + "\">" + course.name
                             + "</div>");
             }
             $(document.body).append($row);
@@ -69,12 +78,20 @@ $(function() {
         for (var i = 0; i < tree.length; i++) {
             for (var j = 0; j < tree[i].length; j++) {
                 var $from = $("#" + tree[i][j].id);
-                var fromX = $from.offset().left + $from.width() / 2 + parseInt($from.css("padding"));
-                var fromY = $from.offset().top// + $from.height() + parseInt($from.css("padding")) * 2;
+                var fromX = $from.offset().left
+                    + $from.width() / 2
+                    + parseInt($from.css("padding"));
+                var fromY = $from.offset().top
+//                    + $from.height()
+//                    + parseInt($from.css("padding")) * 2;
                 eachPrereqInCourse(tree, tree[i][j], function(prereq) {
                     var $to = $("#" + prereq.id);
-                    var toX = $to.offset().left + $to.width() / 2 + parseInt($to.css("padding"));
-                    var toY = $to.offset().top + $to.height() + parseInt($to.css("padding")) * 2;
+                    var toX = $to.offset().left
+                        + $to.width() / 2
+                        + parseInt($to.css("padding"));
+                    var toY = $to.offset().top
+                        + $to.height()
+                        + parseInt($to.css("padding")) * 2;
                     // draw the line
                     var $line = $(document.createElement("div"));
                     $line.addClass("line");
