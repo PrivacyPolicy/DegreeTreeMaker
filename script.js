@@ -1,14 +1,13 @@
-var jsonData = {};
-var rows = [[]];
 const DEBUG = false;
 const HIDE_SINGLES = false;
 
 $(function() {
     
-//    var jsonData = {};
     // TODO provide way of changing this at the beginning
     var major = "Computer Science & Information Technology, B.S.";
     var conc = "Information Assurance & Cyber Security";
+    var jsonData = {};
+    var rows = [[]];
     
     $.ajax({
         url: "output.json",
@@ -17,12 +16,32 @@ $(function() {
         success: function(data, textStatus, jqXHR) {
             console.log("Loaded JSON just fine: %o", data);
             jsonData = data;
-            init();
+            
+            // fill select box with data
+            for (var m in jsonData) {
+                for (var c in jsonData[m]) {
+                    $("#degreeConcentration").append(
+                        "<option value=\"" + m + "-" + c + "\""
+                        + ">" + m + " - " + c + "</option>");
+                }
+            }
+            $("#degreeConcentration").change(selectDegree);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.error("Failed to load JSON: " + errorThrown);
         }
     });
+    
+    function selectDegree(event) {
+        var option = event.target.selectedOptions[0];
+        if (option.value !== "null") {
+            var a = option.value.split("-");
+            major = a[0];
+            conc = a[1];
+            $("#degreeConcentration").addClass("hidden");
+            init();
+        }
+    }
     
     function init() {
         // initialize the data
@@ -314,7 +333,6 @@ $(function() {
                 $(".line").addClass("invisible");
                 $("[data-from=" + id + "], [data-to=" + id + "]")
                     .removeClass("invisible");
-                // go further??
             } else {
                 $(".line").removeClass("invisible");
             }

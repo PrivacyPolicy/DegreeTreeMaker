@@ -6,6 +6,17 @@ body {
     font-family: sans-serif;
 }
 
+#degreeConcentration {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#degreeConcentration.hidden {
+    display: none;
+}
+
 .row {
     white-space: nowrap;
     margin-bottom: 100px;
