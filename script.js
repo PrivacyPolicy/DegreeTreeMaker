@@ -80,18 +80,18 @@ $(function() {
                 var $from = $("#" + tree[i][j].id);
                 var fromX = $from.offset().left
                     + $from.width() / 2
-                    + parseInt($from.css("padding"));
+                    + parseInt($from.css("padding-left"));
                 var fromY = $from.offset().top
 //                    + $from.height()
-//                    + parseInt($from.css("padding")) * 2;
+//                    + parseInt($from.css("padding-top")) * 2;
                 eachPrereqInCourse(tree, tree[i][j], function(prereq) {
                     var $to = $("#" + prereq.id);
                     var toX = $to.offset().left
                         + $to.width() / 2
-                        + parseInt($to.css("padding"));
+                        + parseInt($to.css("padding-left"));
                     var toY = $to.offset().top
                         + $to.height()
-                        + parseInt($to.css("padding")) * 2;
+                        + parseInt($to.css("padding-top")) * 2;
                     // draw the line
                     var $line = $(document.createElement("div"));
                     $line.addClass("line");
@@ -102,6 +102,7 @@ $(function() {
                         left: fromX + "px",
                         top: fromY + "px",
                         transform: "rotate(" + angle + "rad)",
+                        "-moz-transform": "rotate(" + angle + "rad)",
                         width: width + "px"
                     });
                     if (DEBUG) {
