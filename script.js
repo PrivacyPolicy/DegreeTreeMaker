@@ -155,6 +155,18 @@ $(function() {
             }
         }
         
+        // organize all of the rows
+        // most important classes to the left
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].sort(sortCourses);
+        }
+        
+        function sortCourses(a, b) {
+            if (a.prereqs.length > b.prereqs.length) return -1;
+            if (a.prereqs.length < b.prereqs.length) return 1;
+            return 0;
+        }
+        
         return rows;
     }
     
