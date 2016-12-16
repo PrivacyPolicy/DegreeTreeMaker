@@ -82,7 +82,8 @@ $(function() {
                 if (k === 0) prereqs += "None";
                 $row.append("<div class=course id="
                             + course.id + " title=\""
-                            + prereqs + "\">" + course.name
+                            + prereqs + "\" tabindex=0>"
+                            + course.name
                             + "</div>");
             }
             $(document.body).append($row);
@@ -121,6 +122,8 @@ $(function() {
                         width: width + "px",
                         border: (or) ? "2px dashed" : "2px solid"
                     });
+                    $line.attr("data-from", $from.attr("id"));
+                    $line.attr("data-to", $to.attr("id"));
                     if (DEBUG) {
                         $(document.createElement("div")).css({
                             left: toX + "px",
@@ -141,6 +144,8 @@ $(function() {
                 });
             }
         }
+        
+        setListeners();
     }
     
     // calculate the tree of courses (i.e. which courses go to which row)
@@ -288,6 +293,32 @@ $(function() {
                     callback(prereqObjs[j],
                              (prereqObjs.length > 1));
                 }
+            }
+        }
+    }
+    
+
+    // some fun visual stuff
+    function setListeners() {
+        $(".course").on("focus", function(event) {
+            setTimeout(function() {
+                showHideLines(true, event);
+            }, 10);
+        }).on("blur", function(event) {
+            if ($(":focus").size() === 0) {
+                showHideLines(false, event);
+            }
+        });
+        
+        function showHideLines(show, event) {
+            if (show) {
+                var id = event.currentTarget.id;
+                $(".line").addClass("invisible");
+                $("[data-from=" + id + "], [data-to=" + id + "]")
+                    .removeClass("invisible");
+                // go further??
+            } else {
+                $(".line").removeClass("invisible");
             }
         }
     }

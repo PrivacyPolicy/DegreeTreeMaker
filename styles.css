@@ -23,10 +23,23 @@ body {
     align-content: center;
     display: inline-table;
     align-self: center;
+    cursor: pointer;
+}
+
+.course:focus {
+    outline: 5px solid skyblue;
 }
 
 .line {
     position: absolute;
     transform-origin: left;
     border-bottom: 2px solid;
+    
+    -webkit-transition: opacity .4s;
+    transition: opacity .4s;
+}
+
+.line.invisible {
+    opacity: 0;
+    pointer-events: none;
 }
