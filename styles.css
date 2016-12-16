@@ -9,8 +9,6 @@ body {
 .row {
     white-space: nowrap;
     margin-bottom: 100px;
-    text-align: center;
-    -margin: 0;
 }
 
 .course {
@@ -25,8 +23,6 @@ body {
     align-content: center;
     display: inline-table;
     align-self: center;
-    -margin: 0;
-    -padding: 0;
 }
 
 .line {
