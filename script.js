@@ -69,6 +69,13 @@ $(function() {
         // calculate the tree
         var tree = calculateCourseTree(courses);
         
+        displayTree(tree);
+        
+        setListeners();
+    }
+    
+    // output tree as divs
+    function displayTree(tree) {
         // display course blocks
         const LEFT_OFFSET = 10;
         $(".row, .line").remove();
@@ -176,8 +183,6 @@ $(function() {
                 });
             }
         }
-        
-        setListeners();
     }
     
     // calculate the tree of courses (i.e. which courses go to which row)
