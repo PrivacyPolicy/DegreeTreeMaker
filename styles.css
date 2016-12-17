@@ -50,5 +50,5 @@ body {
 }
 
 .line.invisible {
-    opacity: 0;
+    opacity: .1;
 }
