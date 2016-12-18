@@ -1,6 +1,6 @@
 $(function() {
     const DEBUG = false;
-    const HIDE_SINGLES = false;
+    var hideSingles = false;
     const MAX_TRIES = 100;
     
     var major = "Computer Science & Information Technology, B.S.";
@@ -28,6 +28,13 @@ $(function() {
                 }
             }
             $("#degreeConcentration").change(selectDegree);
+            $("#showSingles").change(function(event) {
+                hideSingles = !event.target.checked;
+                var selElem = $("#degreeConcentration").get(0);
+                if (selElem.selectedIndex !== 0) {
+                    init();
+                }
+            });
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.error("Failed to load JSON: " + errorThrown);
@@ -46,7 +53,7 @@ $(function() {
     
     function init() {
         // initialize the data
-        var courses = jsonData[major][conc];
+        var courses = jsonData[major][conc].slice();
         // ensure that if course A has a coreq B, then course
         // B's coreq list includes course A
         for (var i = 0; i < courses.length; i++) {
@@ -60,7 +67,7 @@ $(function() {
             }
         }
         
-        if (HIDE_SINGLES) {
+        if (hideSingles) {
             var prereqIDs = [];
             for (var i = 0; i < courses.length; i++) {
                 var p = courses[i].prereqs;
