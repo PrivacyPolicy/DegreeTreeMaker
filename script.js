@@ -1,6 +1,7 @@
 $(function() {
     const DEBUG = false;
     const HIDE_SINGLES = false;
+    const MAX_TRIES = 100;
     
     var major = "Computer Science & Information Technology, B.S.";
     var conc = "Information Assurance & Cyber Security";
@@ -46,6 +47,18 @@ $(function() {
     function init() {
         // initialize the data
         var courses = jsonData[major][conc];
+        // ensure that if course A has a coreq B, then course
+        // B's coreq list includes course A
+        for (var i = 0; i < courses.length; i++) {
+            var course = courses[i];
+            for (var j = 0; j < course.coreq.length; j++) {
+                var coreq = course.coreq[j];
+                var coreqObj = findCourseByID([courses], coreq);
+                if (coreqObj.coreq.indexOf(course.id) === -1) {
+                    coreqObj.coreq.push(course.id);
+                }
+            }
+        }
         
         if (HIDE_SINGLES) {
             var prereqIDs = [];
@@ -85,6 +98,7 @@ $(function() {
         
         // recursively move the course's prereqs (and sub-prereqs)
         // one row below current row
+        var tries = MAX_TRIES;
         do {
             var i = 0;
             do {
@@ -95,8 +109,12 @@ $(function() {
                 });
                 i++;
             } while (rows[i] && rows[i].length > 0);
-            displayTree(rows);
-        } while (!isValidTree(rows)); // until no change has occured
+            tries--;
+        } while (// until no change has occured
+            !isValidTree(rows) && tries > 0);
+        
+        if (tries <= 0) console.error(
+            "Failed to complete; diagram may be inaccurate.");
         
         // organize all of the rows
         // most important courses to the left
@@ -229,7 +247,6 @@ $(function() {
     // ensure that all prereqs of a course appear above the course
     // and that coreqs are on the same line
     function isValidTree(tree) {
-//        console.log(tree);
         for (var i = 0; i < tree.length; i++) {
             for (var j = 0; j < tree[i].length; j++) {
                 var course = tree[i][j];
@@ -247,7 +264,9 @@ $(function() {
                 // check coreqs
                 for (var k = 0; k < course.coreq.length; k++) {
                     var coreq = findCourseByID(tree, course.coreq[k]);
-                    if (coreq.row != course.row) return false;
+                    if (coreq.row !== course.row) {
+                        return false;
+                    }
                 }
             }
         }
