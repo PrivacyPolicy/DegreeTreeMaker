@@ -74,6 +74,47 @@ $(function() {
         setListeners();
     }
     
+    // calculate the tree of courses (i.e. which courses go to which row)
+    function calculateCourseTree(courses) {
+        rows = [[]];
+        // preprocess data by placing all courses at the top
+        for (var i = 0; i < courses.length; i++) {
+            courses[i].row = 0;
+            rows[0].push(courses[i]);
+        }
+        
+        // recursively move the course's prereqs (and sub-prereqs)
+        // one row below current row
+        do {
+            var i = 0;
+            do {
+                eachPrereqInRow(rows, i, function(course) {
+                    if (course.row < i + 1) {
+                        moveCourseToRow(rows, course, i + 1, true, true);
+                    }
+                });
+                i++;
+            } while (rows[i] && rows[i].length > 0);
+            displayTree(rows);
+        } while (!isValidTree(rows)); // until no change has occured
+        
+        // organize all of the rows
+        // most important courses to the left
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].sort(sortCourses);
+        }
+        
+        function sortCourses(a, b) {
+            var _a = a.prereqs.length + getDependantsCount(rows, a);
+            var _b = b.prereqs.length + getDependantsCount(rows, b);
+            if (_a > _b) return -1;
+            if (_a < _b) return 1;
+            return 0;
+        }
+        
+        return rows;
+    }
+    
     // output tree as divs
     function displayTree(tree) {
         // display course blocks
@@ -111,7 +152,7 @@ $(function() {
                 }
                 if (k === 0) prereqs += "None";
                 // find courses which have this course as prerequisite
-                var dependStr = "Dependants:\n";
+                var dependStr = "Dependancies:\n";
                 var dependants = getDependants(tree, course);
                 for (var k = 0; k < dependants.length; k++) {
                     dependStr += dependants[k].name
@@ -185,68 +226,32 @@ $(function() {
         }
     }
     
-    // calculate the tree of courses (i.e. which courses go to which row)
-    function calculateCourseTree(courses) {
-        rows = [[]];
-        // preprocess data by placing all courses at the top
-        for (var i = 0; i < courses.length; i++) {
-            courses[i].row = 0;
-            rows[0].push(courses[i]);
-        }
-        
-        // recursively move the course's prereqs (and sub-prereqs)
-        // one row below current row
-        var lastRows;
-        do {
-            lastRows = JSON.stringify(rows);
-            var i = 0;
-            do {
-                eachPrereqInRow(rows, i, function(course) {
-                    if (course.row < i + 1) {
-                        moveCourseToRow(rows, course, i + 1, true);
+    // ensure that all prereqs of a course appear above the course
+    // and that coreqs are on the same line
+    function isValidTree(tree) {
+//        console.log(tree);
+        for (var i = 0; i < tree.length; i++) {
+            for (var j = 0; j < tree[i].length; j++) {
+                var course = tree[i][j];
+                // check prereqs
+                var returnValue = true;
+                eachPrereqInCourse(tree, course,
+                                   function(prereq, isCoPrereq) {
+                    if (prereq.row <= course.row) {
+                        returnValue = false;
                     }
                 });
-                i++;
-            } while (rows[i] && rows[i].length > 0);
-        } while (lastRows != JSON.stringify(rows)); // until no change has occured
-        // find all co-requisites and add them back where they belong
-        // for all that have a co-requisite
-        for (var i = 0; i < rows.length; i++) {
-            for (var j = 0; j < rows[i].length; j++) {
-                var course = rows[i][j];
-                if (course.coreq.length > 0) {
-                    var coreqs = [course];
-                    for (var k = 0; k < course.coreq.length; k++) {
-                        coreqs.push(findCourseByID(
-                            rows, course.coreq[k]));
-                    }
-                    // move all coreqs to the lowest row
-                    var maxRow = 0;
-                    for (var k = 0; k < coreqs.length; k++) {
-                        maxRow = Math.max(coreqs[k].row, maxRow);
-                    }
-                    for (var k = 0; k < coreqs.length; k++) {
-                        moveCourseToRow(rows, coreqs[k], maxRow, false);
-                    }
+                if (returnValue === false) {
+                    return false;
+                }
+                // check coreqs
+                for (var k = 0; k < course.coreq.length; k++) {
+                    var coreq = findCourseByID(tree, course.coreq[k]);
+                    if (coreq.row != course.row) return false;
                 }
             }
         }
-        
-        // organize all of the rows
-        // most important courses to the left
-        for (var i = 0; i < rows.length; i++) {
-            rows[i].sort(sortCourses);
-        }
-        
-        function sortCourses(a, b) {
-            var _a = a.prereqs.length + getDependantsCount(rows, a);
-            var _b = b.prereqs.length + getDependantsCount(rows, b);
-            if (_a > _b) return -1;
-            if (_a < _b) return 1;
-            return 0;
-        }
-        
-        return rows;
+        return true;
     }
     
     // function to count how many courses have course as a prereq
@@ -285,9 +290,7 @@ $(function() {
                 }
             } else if (typeof array[i] === "object"
                        && array[i].length !== undefined) {
-                if (arrayContains(array[i], value)) {
-                    return true;
-                }
+                return arrayContains(array[i], value);
             }
         }
         return false;
@@ -295,7 +298,7 @@ $(function() {
     
     // function to move course down to a specified row
     // moves the course and all prerequisites underneath it recursively
-    function moveCourseToRow(rows, course, row, recursive) {
+    function moveCourseToRow(rows, course, row, prereqs, coreqs) {
         // delete from old row
         for (var i = 0; i < rows[course.row].length; i++) {
             if (rows[course.row][i].id == course.id) {
@@ -309,10 +312,24 @@ $(function() {
         }
         rows[row].push(course);
         
+        // move all of the course's corequisites, too
+        if (coreqs) {
+            if (course.coreq.length > 0) {
+                var coreqs = [course];
+                for (var j = 0; j < course.coreq.length; j++) {
+                    coreqs.push(findCourseByID(
+                        rows, course.coreq[j]));
+                }
+                for (var j = 0; j < coreqs.length; j++) {
+                    moveCourseToRow(rows, coreqs[j], row, true, false);
+                }
+            }
+        }
+        
         // move all of the course's prerequisites, too
-        if (recursive) {
+        if (prereqs) {
             eachPrereqInCourse(rows, course, function(prereq) {
-                moveCourseToRow(rows, prereq, row + 1, true);
+                moveCourseToRow(rows, prereq, row + 1, true, true);
             });
         }
     }
@@ -364,7 +381,6 @@ $(function() {
             }
         }
     }
-    
 
     // some fun visual stuff
     function setListeners() {
