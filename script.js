@@ -58,11 +58,11 @@ $(function() {
         // B's coreq list includes course A
         for (var i = 0; i < courses.length; i++) {
             var course = courses[i];
-            for (var j = 0; j < course.coreq.length; j++) {
-                var coreq = course.coreq[j];
+            for (var j = 0; j < course.coreqs.length; j++) {
+                var coreq = course.coreqs[j];
                 var coreqObj = findCourseByID([courses], coreq);
-                if (coreqObj.coreq.indexOf(course.id) === -1) {
-                    coreqObj.coreq.push(course.id);
+                if (coreqObj.coreqs.indexOf(course.id) === -1) {
+                    coreqObj.coreqs.push(course.id);
                 }
             }
         }
@@ -79,7 +79,7 @@ $(function() {
             }
             for (var i = courses.length - 1; i >= 0; i--) {
                 var c = courses[i];
-                if (c.coreq.length === 0 && c.prereqs.length === 0
+                if (c.coreqs.length === 0 && c.prereqs.length === 0
                     && prereqIDs.indexOf(c.id) === -1) {
                     courses.splice(i, 1);
                 }
@@ -269,8 +269,8 @@ $(function() {
                     return false;
                 }
                 // check coreqs
-                for (var k = 0; k < course.coreq.length; k++) {
-                    var coreq = findCourseByID(tree, course.coreq[k]);
+                for (var k = 0; k < course.coreqs.length; k++) {
+                    var coreq = findCourseByID(tree, course.coreqs[k]);
                     if (coreq.row !== course.row) {
                         return false;
                     }
@@ -340,11 +340,11 @@ $(function() {
         
         // move all of the course's corequisites, too
         if (coreqs) {
-            if (course.coreq.length > 0) {
+            if (course.coreqs.length > 0) {
                 var coreqs = [course];
-                for (var j = 0; j < course.coreq.length; j++) {
+                for (var j = 0; j < course.coreqs.length; j++) {
                     coreqs.push(findCourseByID(
-                        rows, course.coreq[j]));
+                        rows, course.coreqs[j]));
                 }
                 for (var j = 0; j < coreqs.length; j++) {
                     moveCourseToRow(rows, coreqs[j], row, true, false);
