@@ -64,6 +64,19 @@ $(function() {
                 if (coreqObj.coreqs.indexOf(course.id) === -1) {
                     coreqObj.coreqs.push(course.id);
                 }
+                // add coreqs from A to B and vice-versa
+                var coCoreqs = coreqObj.coreqs;
+                var coreqs = course.coreqs;
+                for (var k = 0; k < coreqs.length; k++) {
+                    if (coCoreqs.indexOf(coreqs[k]) === -1) {
+                        coCoreqs.push(coreqs[k]);
+                    }
+                }
+                for (var k = 0; k < coCoreqs.length; k++) {
+                    if (coreqs.indexOf(coCoreqs[k]) === -1) {
+                        coreqs.push(coCoreqs[k]);
+                    }
+                }
             }
         }
         
